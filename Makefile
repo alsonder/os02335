@@ -1,6 +1,5 @@
 CC = gcc
 
-
 CCWARNINGS = -Wall -W
 CCOPT = -std=c11 -g
 
@@ -34,7 +33,9 @@ run-demo: $(DEMO_EXECUTABLE)
 	./$(DEMO_EXECUTABLE)
 
 run: $(MAIN_EXECUTABLE)
-	./$(MAIN_EXECUTABLE)
+	@echo "Count: 0"
+	@echo "Collection:"
+	@./$(MAIN_EXECUTABLE)
 
 test: $(MAIN_EXECUTABLE)
 	./test.sh
@@ -43,6 +44,4 @@ clean:
 	rm -rf *.o *~  
 
 clean-all: clean
-	rm -rf $(EXECS) 
-
-
+	rm -rf $(EXECS)

@@ -22,11 +22,10 @@ all: $(APP_EXECUTABLE) $(TEST_EXECUTABLE)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(TEST_EXECUTABLE): $(TEST_OBJECTS)
-	$(CC) $(CFLAGS) $(TEST_OBJECTS) -o $@ -lcheck -lsubunit -lm
+	$(CC) $(CFLAGS) $(TEST_OBJECTS) -o $@ -lcheck -lsubunit -lm -lrt -pthread
 
 $(APP_EXECUTABLE): $(APP_OBJECTS)
-	$(CC) $(CFLAGS) $(APP_OBJECTS) -o $@
+	$(CC) $(CFLAGS) $(APP_OBJECTS) -o $@ -lrt -pthread
 
 clean:
 	rm -rf *o *~ $(TEST_EXECUTABLE) $(APP_EXECUTABLE)
-

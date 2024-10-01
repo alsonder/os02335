@@ -5,6 +5,7 @@
 typedef struct Node {
     int value;
     struct Node* next;
+    struct Node* prev; 
 } Node;
 
 void add_to_collection(Node** head, int value);
@@ -26,7 +27,8 @@ int main(void)
     while (1) {
         command = read_char();
         
-        if (command == EOF || (command != 'a' && command != 'b' && command != 'c')) {
+        
+        if (command == EOF || command == 'q' || (command != 'a' && command != 'b' && command != 'c')) {
             break;
         }
 
@@ -45,10 +47,7 @@ int main(void)
         }
     }
 
-    write_string("Count: ");
-    write_int(counter);
-    write_char('\n');
-    write_string("Collection: ");
+    
     print_collection(head);
 
     free_collection(head);
@@ -64,6 +63,7 @@ void add_to_collection(Node** head, int value) {
     }
     new_node->value = value;
     new_node->next = NULL;
+    new_node->prev = NULL;  
 
     if (*head == NULL) {
         *head = new_node;
@@ -73,6 +73,7 @@ void add_to_collection(Node** head, int value) {
             current = current->next;
         }
         current->next = new_node;
+        new_node->prev = current;  
     }
 }
 
@@ -86,12 +87,14 @@ void remove_last(Node** head) {
     }
 
     Node* current = *head;
-    while (current->next->next != NULL) {
+    while (current->next != NULL) {
         current = current->next;
     }
 
-    free(current->next);
-    current->next = NULL;
+    if (current->prev != NULL) {
+        current->prev->next = NULL;  
+    }
+    free(current);
 }
 
 void print_collection(Node* head) {
@@ -100,13 +103,14 @@ void print_collection(Node* head) {
 
     while (current != NULL) {
         if (!first) {
-            write_char(' ');
+            write_char(',');  
         }
         write_int(current->value);
         first = 0;
         current = current->next;
     }
-    write_char('\n');
+    write_char(';');  
+    write_char('\n');  
 }
 
 void free_collection(Node* head) {

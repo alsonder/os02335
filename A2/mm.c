@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "mm.h"
 
+//Used GitHub CoPilot plugin for VSCode and http://perplexity.ai for a lot of bugfixing and refactoring
+
 /* Proposed data structure elements */
 typedef struct header {
     struct header *next;      // Bit 0 is used to indicate a free block
@@ -9,18 +11,18 @@ typedef struct header {
 } BlockHeader;
 
 // Macros to access fields in the header
-#define FREE_MASK 0x1
-#define GET_NEXT(p) ((BlockHeader *)((uintptr_t)(p->next) & ~FREE_MASK))
-#define SET_NEXT(p, n) p->next = (BlockHeader *)((uintptr_t)(n) | ((uintptr_t)(p->next) & FREE_MASK))
-#define GET_FREE(p) (uint8_t)((uintptr_t)(p->next) & FREE_MASK)
-#define SET_FREE(p, f) p->next = (BlockHeader *)((uintptr_t)GET_NEXT(p) | (f & FREE_MASK))
-#define SIZE(p) ((uintptr_t)GET_NEXT(p) - (uintptr_t)(p) - sizeof(BlockHeader))
+
+#define FREE_MASK 0x1 // Mask to extract the free bit
+#define GET_NEXT(p) ((BlockHeader *)((uintptr_t)(p->next) & ~FREE_MASK)) // Mask out the free bit
+#define SET_NEXT(p, n) p->next = (BlockHeader *)((uintptr_t)(n) | ((uintptr_t)(p->next) & FREE_MASK)) // Preserve the free bit
+#define GET_FREE(p) (uint8_t)((uintptr_t)(p->next) & FREE_MASK) // Extract the free bit
+#define SET_FREE(p, f) p->next = (BlockHeader *)((uintptr_t)GET_NEXT(p) | (f & FREE_MASK)) // Set the free bit
+#define SIZE(p) ((uintptr_t)GET_NEXT(p) - (uintptr_t)(p) - sizeof(BlockHeader)) // Calculate the size of the block
 #define MIN_SIZE (8)  // Minimum size of a block (excluding header)
 
 static BlockHeader *first = NULL;
 static BlockHeader *current = NULL;
 
-// Memory management boundaries (externally defined)
 extern const uintptr_t memory_start;
 extern const uintptr_t memory_end;
 

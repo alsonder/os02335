@@ -3,6 +3,7 @@
 
 // From A1/main.c:
 
+#include "mm.h"
 #include "io.h"
 #include <stdlib.h>
 
@@ -61,7 +62,7 @@ int main(void)
 }
 
 void add_to_collection(Node** head, int value) {
-    Node* new_node = (Node*)malloc(sizeof(Node));
+    Node* new_node = (Node*)simple_malloc(sizeof(Node));
     if (new_node == NULL) {
         write_string("Memory allocation failed\n");
         exit(1);
@@ -84,7 +85,7 @@ void remove_last(Node** head) {
     if (*head == NULL) return;
 
     if ((*head)->next == NULL) {
-        free(*head);
+        simple_free(*head);
         *head = NULL;
         return;
     }
@@ -94,7 +95,7 @@ void remove_last(Node** head) {
         current = current->next;
     }
 
-    free(current->next);
+    simple_free(current->next);
     current->next = NULL;
 }
 
@@ -117,7 +118,7 @@ void free_collection(Node* head) {
     Node* current = head;
     while (current != NULL) {
         Node* next = current->next;
-        free(current);
+        simple_free(current);
         current = next;
     }
 }

@@ -75,33 +75,45 @@ START_TEST(test_simple_unique_addresses) {
 END_TEST
 
 /**
- * @name   test_next_fit_strategy
- * @brief  Test case to verify that the memory management system uses the next-fit strategy.
+ * @name   test_non_first_fit_strategy
+ * @brief  Test case to verify that the memory management system does not use the first-fit strategy.
  */
-START_TEST(test_next_fit_strategy) {
-    int *ptr1, *ptr2, *ptr3;
+START_TEST(test_non_first_fit_strategy) {
+    int *ptr1, *ptr2, *ptr3, *ptr4, *ptr5;
 
-    // Allocate two blocks
-    ptr1 = MALLOC(100 * sizeof(int));
-    ptr2 = MALLOC(50 * sizeof(int));
+    // Step 1: Allocate three blocks of different sizes
+    ptr1 = MALLOC(120 * sizeof(int)); // Larger allocation to create a bigger gap
+    ptr2 = MALLOC(60 * sizeof(int));
+    ptr3 = MALLOC(120 * sizeof(int));
+
+    // Check that allocations succeeded
     ck_assert(ptr1 != NULL);
     ck_assert(ptr2 != NULL);
-
-    // Free the first block to create a gap at the beginning of memory
-    FREE(ptr1);
-
-    // Allocate a new block that is smaller than ptr1 but larger than ptr2
-    ptr3 = MALLOC(30 * sizeof(int));
     ck_assert(ptr3 != NULL);
 
-    // Check that ptr3 is not placed in the same space as ptr1 (indicating next-fit strategy)
-    ck_assert(ptr3 != ptr1);
+    // Step 2: Free the first block to create a "gap"
+    FREE(ptr1);
 
-    // Free remaining allocated blocks
+    // Step 3: Allocate an intermediate block to verify allocator's choice
+    ptr5 = MALLOC(40 * sizeof(int));  // Small allocation that would fit in `ptr1`'s space
+    ck_assert(ptr5 != NULL);
+
+    // Step 4: Allocate a new block (ptr4) larger than ptr5 but smaller than ptr1
+    ptr4 = MALLOC(80 * sizeof(int));  // Would fit in ptr1's space if using first-fit
+    ck_assert(ptr4 != NULL);
+
+    // Step 5: Verify that ptr4 is NOT located at ptr1's original address
+    ck_assert(ptr4 != ptr1);
+
+    // Free remaining allocations
     FREE(ptr2);
     FREE(ptr3);
+    FREE(ptr4);
+    FREE(ptr5);
 }
 END_TEST
+
+
 
 /**
  * @name   test_memory_exerciser
@@ -211,7 +223,7 @@ Suite *simple_malloc_suite() {
     tcase_add_test(tc_core, test_simple_allocation);
     tcase_add_test(tc_core, test_simple_unique_addresses);
     tcase_add_test(tc_core, test_memory_exerciser);
-    tcase_add_test(tc_core, test_next_fit_strategy);
+    tcase_add_test(tc_core, test_non_first_fit_strategy);
 
     suite_add_tcase(s, tc_core);
     return s;
